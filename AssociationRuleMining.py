@@ -81,6 +81,10 @@ def printTransactions(transactionsArray):
 	for transaction in transactionsArray:
 		transaction.printData()
 
+#Alphabetizes a string of items so that our set removes duplicates!:
+def alphabetizeList(ItemsetToSort):
+	return ",".join(sorted(ItemsetToSort.split(",")))
+
 #creates a vertical table of Product:[Transaction IDs] to quickly calculate supports of intersections of itemsets
 def constructVerticalProducts(Transactions, Products):
 	verticalTable = {}
@@ -147,13 +151,15 @@ def generateFrequentItemsets(Transactions, Products, minSupport):
 	
 	lst = generateNextCandidateList(frequentItemset)
 	second = generateNextCandidateList(lst)
+	#third = generateNextCandidateList(second)
 
 	return frequentItemset
 
 #Issues: Need to Prevent Duplication of Item Sets (ABC vs BCA and such)
 def generateNextCandidateList(ListToJoin):
 	#make list a set, ez
-	nextList = []
+	ListToJoin = list(ListToJoin)
+	nextList = set()
 
 	print ("```````````````````````````Generating Next Candidate List`````````````````````")
 
@@ -166,7 +172,8 @@ def generateNextCandidateList(ListToJoin):
 				if item == other:
 					pass
 				else:
-					nextList.append(item + "," + other)
+					itemToAdd = alphabetizeList(item + "," + other)
+					nextList.add(itemToAdd)
 	else:
 		print ("|||Creating Joined List of K = %d|||" %sizeOfItem)
 		for item in ListToJoin:
@@ -180,6 +187,7 @@ def generateNextCandidateList(ListToJoin):
 					#print ("are the first N-1 elements the same?")
 					others = other.split(",")
 					#For each element in items/others, as long as 
+					print ("`````````````````printing items and others``````````````````")
 					print items
 					print others
 					for o in range(0,len(items)):
@@ -187,18 +195,22 @@ def generateNextCandidateList(ListToJoin):
 						if items[o] != others[o] and o != len(items) - 1:
 							print (items[o] + " isn't " + others[o])
 							similar = False
+							break
 						elif items[o] != others[o] and o == len(items) - 1 and similar:
-							print ("Appending " + item + "and " + other)
+							print ("====================APPENDING APPENDING APPENDING " + item + " and " + other)
+							print (items[o], others[o])
 							joinedItem = item + "," + others[o]
+							joinedItem = alphabetizeList(joinedItem)
 							if joinedItem not in nextList:
-								nextList.append(joinedItem)
+								nextList.add(joinedItem)
 
 
 	print ("``````````````````````````Done Generating Next Candidate List`````````````````")
 	print ("``````````````````````````Printing Joined List````````````````````````````````")
 
-	for item in nextList: print item
+	for item in sorted(list(nextList)): print item
 
+	#nextList = List(nextList)
 	return nextList
 
 #Given a single product, find the support parameter given our Transactions Array
